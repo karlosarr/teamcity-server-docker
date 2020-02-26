@@ -11,5 +11,29 @@ services:
       - ./teamcity_server/logs://opt/teamcity/logs
     networks:
       - net
+  teamcity-server-db:
+    image: mariadb:10.4
+    restart: always
+    environment:
+      MYSQL_DATABASE: teamcity
+      MYSQL_USER: user_teamcity
+      MYSQL_PASSWORD: password_teamcity
+      MYSQL_ROOT_PASSWORD: toor
+    volumes:
+      - db-volumes:/var/lib/mysql
+    networks:
+      - net
+  teamcity-agent-docker:
+    image: jetbrains/teamcity-agent
+    environment:
+      SERVER_URL: http://teamcity-server-instance:8111
+      DOCKER_IN_DOCKER: start 
+    volumes:
+      - ./teamcity_agent/docker/conf:/data/teamcity_agent/conf
+      #- ./teamcity_agent/docker/docker:/var/lib/docker
+    networks:
+      - net
 networks:
   net:
+volumes:
+  db-volumes:
